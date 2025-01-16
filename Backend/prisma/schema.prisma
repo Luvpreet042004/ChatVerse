@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  name      String
+  email     String  @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sentDirectMessages DirectMessage[] @relation("Sender")
+  receivedDirectMessages DirectMessage[] @relation("Recipient")
+
+  connections User[] @relation("UserConnections")
+  connectedTo User[] @relation("UserConnections")
+}
+
+model DirectMessage {
+  id        Int     @id @default(autoincrement())
+  content   String
+  senderId  Int
+  receiverId Int
+  timestamp DateTime
+  status    MessageStatus
+
+  sender User   @relation(fields: [senderId], references: [id], name: "Sender")
+  receiver User @relation(fields: [receiverId], references: [id], name: "Recipient")
+}
+
+enum MessageStatus {
+  sent
+  delivered
+  read
+}
