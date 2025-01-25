@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect,useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase-config';
 import {sendPasswordResetEmail,signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import axios from 'axios';
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+      const token = localStorage.getItem('authToken')
+      if(token){
+        navigate('/dashboard/friend',{replace : true});
+      }
+    },[navigate])
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(''); // State for error messages
-  const navigate = useNavigate();
 
   const handleForgotPassword = () => {
     const email = prompt("Please enter your email to reset your password:");
@@ -34,7 +41,7 @@ const Login: React.FC = () => {
       const user = userCredential.user;
       const token = await user.getIdToken();
 
-      const response = await axios.get("http://localhost:5000/api/users/login",{
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/login`,{
         headers :{
           Authorization :`Bearer ${token}`
         }
@@ -44,7 +51,7 @@ const Login: React.FC = () => {
       localStorage.setItem("authToken",token)
       localStorage.setItem("userName",response.data.name)
       localStorage.setItem("userId",response.data.id)
-      navigate('/dashboard/friend'); // Redirect to dashboard
+      navigate('/dashboard/friend',{ replace: true }); // Redirect to dashboard
     } catch (error: any) {
       if (error.code === 'auth/wrong-password') {
         setError('Invalid password. Please try again.');
@@ -65,7 +72,7 @@ const Login: React.FC = () => {
       const user = result.user;
       const token = await user.getIdToken();
 
-      const response = await axios.get("http://localhost:5000/api/users/login",{
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/login`,{
         headers :{
           Authorization :`Bearer ${token}`
         }
@@ -78,7 +85,8 @@ const Login: React.FC = () => {
 
       // Store user data in localStorage (if needed)
       localStorage.setItem('userEmail', result.user.email || '');
-      navigate('/dashboard/friend'); // Redirect to dashboard
+      navigate('/dashboard/friend',{ replace: true }); // Redirect to dashboard
+      window.history.pushState(null,'','/dashboard/friend')
     } catch (error: any) {
       setError('Google Sign-In failed. Please try again.');
       console.error('Google Sign-In failed:', error);

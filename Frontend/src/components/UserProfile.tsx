@@ -2,7 +2,6 @@ import React,{useState,useEffect} from 'react';
 import { useConnections } from '../hooks/useConnections';
 import axios from 'axios';
 import ProfileSide from './ProfileSide';
-
 import RemoveFriendModal from './RemoveFriendModel';
 import DeleteUser from '../pages/DeleteUser';
 
@@ -26,7 +25,7 @@ const UserProfile: React.FC = () => {
     const fetchConnections = async () => {
       try {
           setLoading(true);
-          const response = await axios.get('http://localhost:5000/api/users/connections', {
+          const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/connections`, {
           headers: {
               Authorization: `Bearer ${token}`,
           },});
@@ -57,7 +56,7 @@ const UserProfile: React.FC = () => {
     const token = localStorage.getItem("authToken");
 
   try {
-    const response = await axios.delete("http://localhost:5000/api/users/deleteConnections", {
+    const response = await axios.delete(`${import.meta.env.VITE_BASE_URL}/users/deleteConnections`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json", // Ensure proper content type for JSON

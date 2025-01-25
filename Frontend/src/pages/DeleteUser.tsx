@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,14 +8,13 @@ type Props = {
 
 const DeleteUser: React.FC<Props> = ({setIsDelete}) => {
   const navigate = useNavigate();
-    const [password, setPassword] = useState('');
 
     const handleDelete = async(e : React.FormEvent) => {
         e.preventDefault();
 
         try {
             const token = localStorage.getItem("authToken"); // Retrieve the token
-            const response = await axios.delete('http://localhost:5000/api/users/deleteUser', {
+            const response = await axios.delete(`${process.env.BASE_URL}/users/deleteUser`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

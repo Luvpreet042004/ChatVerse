@@ -17,7 +17,7 @@ export const AddUser : React.FC = ()=>{
         try {
             const token = localStorage.getItem('authToken');
             const response = await axios.post(
-                'http://localhost:5000/api/users/check',
+                `${import.meta.env.VITE_BASE_URL}/users/check`,
                 { email },
                 {
                     headers: {
@@ -42,7 +42,7 @@ export const AddUser : React.FC = ()=>{
         try {
             const token = localStorage.getItem('authToken');
             await axios.post(
-                'http://localhost:5000/api/users/connect',
+                `${import.meta.env.VITE_BASE_URL}/users/connect`,
                 { connectionEmail: email },
                 {
                     headers: {
@@ -51,7 +51,7 @@ export const AddUser : React.FC = ()=>{
                 }
             );
 
-            const response = await axios.get('http://localhost:5000/api/users/connections', {
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/connections`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

@@ -52,7 +52,7 @@ const ChatComponent: React.FC = () => {
         const token = localStorage.getItem('authToken')
         try {
           
-          const response= await axios.get(`http://localhost:5000/api/users/getfriend/${receiverId}`,{headers: {
+          const response= await axios.get(`${import.meta.env.VITE_BASE_URL}/users/getfriend/${receiverId}`,{headers: {
             Authorization: `Bearer ${token}`,
         }})
 
@@ -71,7 +71,7 @@ const ChatComponent: React.FC = () => {
         const token = localStorage.getItem("authToken")
         try {
           const response = await axios.get(
-            `http://localhost:5000/api/messages/chat/${Math.min(Number(senderId), Number(receiverId))}/${Math.max(
+            `${import.meta.env.VITE_BASE_URL}/messages/chat/${Math.min(Number(senderId), Number(receiverId))}/${Math.max(
               Number(senderId),
               Number(receiverId)
             )}`,{headers: {

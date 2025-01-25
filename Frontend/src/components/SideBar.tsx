@@ -9,8 +9,6 @@ const SideBar: React.FC = () => {
     const { isOpen } = useIsOpenContext();
     const [isAddOpen, setIsAddUserOpen] = useState(false);
     const [isLoggingOut,setIsLoggingOut] = useState(false);
-
-    console.log('in sidebar');
     
 
     // Function to check if the user exists

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useConnections } from "../hooks/useConnections";
 
-
 type Props = {
     setIsLoggingOut : (value : boolean) => void
 }
@@ -66,7 +65,7 @@ export const AddUserModal: React.FC<AddUserProps> = ({ setIsAddUserOpen }) => {
         try {
             const token = localStorage.getItem('authToken');
             const response = await axios.post(
-                'http://localhost:5000/api/users/check',
+                `${import.meta.env.VITE_BASE_URL}/users/check`,
                 { email },
                 {
                     headers: {
@@ -91,7 +90,7 @@ export const AddUserModal: React.FC<AddUserProps> = ({ setIsAddUserOpen }) => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.post(
-                'http://localhost:5000/api/users/connect',
+                `${import.meta.env.VITE_BASE_URL}/users/connect`,
                 { connectionEmail: email },
                 {
                     headers: {
@@ -100,7 +99,7 @@ export const AddUserModal: React.FC<AddUserProps> = ({ setIsAddUserOpen }) => {
                 }
             );
 
-            const response = await axios.get('http://localhost:5000/api/users/connections', {
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/connections`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

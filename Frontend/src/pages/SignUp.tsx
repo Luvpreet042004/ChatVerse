@@ -1,15 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase-config';
 import {createUserWithEmailAndPassword,sendEmailVerification,signInWithPopup,GoogleAuthProvider,} from 'firebase/auth';
 import axios from 'axios';
 
 const SignUp: React.FC = () => {
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    const token = localStorage.getItem('authToken')
+    if(token){
+      navigate('/dashboard/friend',{replace : true});
+    }
+  },[navigate])
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(''); // State for error messages
-  const navigate = useNavigate();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,12 +36,13 @@ const SignUp: React.FC = () => {
           const token = await user.getIdToken();
           localStorage.setItem("authToken", token);
 
-          const response = await axios.post("http://localhost:5000/api/users/register",{name,email})
+          const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`,{name,email})
 
           localStorage.setItem("userName",name)
           localStorage.setItem("userId",response.data.id)
           alert('Sign-up successful');
-          navigate('/dashboard/friend');
+          navigate('/dashboard/friend',{ replace: true });
+          window.history.pushState(null,'','/dashboard/friend')
         } catch (emailError) {
           // If sendEmailVerification fails, delete the user
           console.log(emailError);
@@ -70,14 +78,14 @@ const SignUp: React.FC = () => {
   
       // Send user data to backend
       try {
-        const response = await axios.post("http://localhost:5000/api/users/register", { name, email });
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, { name, email });
         
         // Store backend response data in localStorage
         localStorage.setItem("userName", response.data.name);
         localStorage.setItem("userId", response.data.id);
   
         alert('Sign-up successful.');
-        navigate('/dashboard/friend');
+        navigate('/dashboard/friend',{ replace: true });
       } catch (backendError) {
         console.error("Backend error:", backendError);
         setError("Failed to create user on the backend. Please try again.");

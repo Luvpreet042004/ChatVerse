@@ -5,7 +5,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import routes from "./routes/index";
 import { PrismaClient } from "@prisma/client";
-import { timeStamp } from "console";
 
 dotenv.config();
 
@@ -34,11 +33,11 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 export const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:5173", // Allow your frontend domain
+    origin: process.env.CLIENT_URL, // Allow your frontend domain
     methods: ["GET", "POST"],
     credentials: true,
   },
-});
+}); 
 
 io.on("connection", (socket: Socket) => {
   console.log("User connected", socket.id);
