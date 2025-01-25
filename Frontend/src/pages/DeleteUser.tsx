@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
     setIsDelete : (vale : boolean) => void
 }
 
 const DeleteUser: React.FC<Props> = ({setIsDelete}) => {
+  const navigate = useNavigate();
     const [password, setPassword] = useState('');
 
     const handleDelete = async(e : React.FormEvent) => {
@@ -13,16 +15,14 @@ const DeleteUser: React.FC<Props> = ({setIsDelete}) => {
 
         try {
             const token = localStorage.getItem("authToken"); // Retrieve the token
-            const response = await axios.delete('http://localhost:5000/api/users/delete', {
+            const response = await axios.delete('http://localhost:5000/api/users/deleteUser', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
-                data: {
-                    password: password,
-                },
             });
             console.log('User account deleted successfully:', response.data);
-            setIsDelete(true)
+            setIsDelete(false)
+            navigate('/signup')
         } catch (error) {
             console.error('Delete failed:', error);
         }
@@ -42,22 +42,6 @@ const DeleteUser: React.FC<Props> = ({setIsDelete}) => {
     <p className="text-gray-600 text-sm mb-4">
       Are you sure you want to delete this user? This action cannot be undone.
     </p>
-    <div className="mb-6">
-      <label
-        className="block text-gray-700 text-sm font-semibold mb-2"
-        htmlFor="password"
-      >
-        Enter Password to Confirm
-      </label>
-      <input
-        type="password"
-        id="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
-        placeholder="••••••••"
-      />
-    </div>
     <div className="flex justify-between items-center">
       <button
         onClick={handleCancel}

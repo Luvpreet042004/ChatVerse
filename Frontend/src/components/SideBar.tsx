@@ -17,7 +17,7 @@ const SideBar: React.FC = () => {
 
     return (
         <div
-            className={`flex fixed top-[50px] shadow-sm flex-col lg:justify-between border-r-2 h-[calc(100vh-50px)] bg-[#ffffff] transition-all duration-100 p-2 ${
+            className={`flex fixed top-[50px] shadow-sm flex-col justify-between border-r-2 h-[calc(100vh-50px)] bg-[#ffffff] transition-all duration-100 p-2 ${
                 isOpen ? "lg:w-[210px]" : "lg:w-[60px]"
             }`}
         >

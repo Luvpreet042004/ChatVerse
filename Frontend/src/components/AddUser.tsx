@@ -1,5 +1,6 @@
-import React ,{useState} from "react";
+import {useState} from "react";
 import axios from "axios";
+import { useConnections } from "../hooks/useConnections";
 
 export const AddUser : React.FC = ()=>{
     const {setConnections} = useConnections();
@@ -57,10 +58,7 @@ export const AddUser : React.FC = ()=>{
             });
             setConnections(response.data.connections); 
 
-            alert('User added successfully!');
-
-
-            closeModal(); // Reset modal state after successful addition
+            alert('User added successfully!'); // Reset modal state after successful addition
         } catch (err) {
             console.log(err);
             
@@ -105,7 +103,6 @@ export const AddUser : React.FC = ()=>{
                             </button>
                         )}
                         <button
-                            onClick={closeModal}
                             className="text-gray-500 hover:text-gray-700 mt-2 w-full"
                         >
                             Cancel
@@ -113,5 +110,3 @@ export const AddUser : React.FC = ()=>{
                     </div>
                 </div>
             )}
-    )
-}

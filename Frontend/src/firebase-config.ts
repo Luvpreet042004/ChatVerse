@@ -2,17 +2,15 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-
+    apiKey: "AIzaSyDpZj-sBDoh71FcJBEH9jL3vOWgBIRGXMY",
+    authDomain: "chatverse-ca933.firebaseapp.com",
+    projectId: "chatverse-ca933",
+    storageBucket: "chatverse-ca933.firebasestorage.app",
+    messagingSenderId: "796660727574",
+    appId: "1:796660727574:web:876a57dcabd3a99ccc9a37",
+    measurementId: "G-THV4H2C60R"
+  };
+  
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Export the auth instance
 export const auth = getAuth(app);
-export default app;

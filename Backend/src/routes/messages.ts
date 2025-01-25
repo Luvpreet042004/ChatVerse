@@ -1,10 +1,19 @@
 import { PrismaClient } from '@prisma/client';
+import axios from 'axios';
 import { Request, Response } from 'express';
 const prisma = new PrismaClient();
 
 export const getMessages = async (req: Request, res: Response) : Promise<void> => {
     const { smaller, larger } = req.params;
-    const id = req.user?.id;
+    const email = req.user?.email;
+    if(!email){
+        res.status(403).json({ message: 'Unauthorized access' });
+        return;
+    }
+
+    const sender = await prisma.user.findUnique({where :{email}})
+    if(!sender){return}
+    const id = sender.id;
 
     // Validate that the current user is one of the participants
     if (id != Number(smaller) && id != Number(larger)) {

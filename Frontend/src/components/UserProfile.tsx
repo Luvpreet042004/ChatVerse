@@ -2,7 +2,7 @@ import React,{useState,useEffect} from 'react';
 import { useConnections } from '../hooks/useConnections';
 import axios from 'axios';
 import ProfileSide from './ProfileSide';
-import ChangePassword from '../pages/ChangePassword';
+
 import RemoveFriendModal from './RemoveFriendModel';
 import DeleteUser from '../pages/DeleteUser';
 
@@ -14,11 +14,12 @@ type UserType = {
 
 
 const UserProfile: React.FC = () => {
+  const [showFriend,setShowFriend] = useState(false)
   const {connections,setConnections} = useConnections();
-  const [isCPOpen,setIsCPOpen] = useState(false);
   const [RemoveFriend,setRemoveFriend] = useState(false);
   const [User,setUser] = useState<UserType>();
   const [isDeleteOpen,setIsDeleteOpen] = useState(false);
+
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -43,6 +44,8 @@ const UserProfile: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
       const [loading, setLoading] = useState<boolean>(true);
       const [error, setError] = useState<string | null>(null);
+
+
 
     const users= searchTerm
             ? connections.filter((user) =>
@@ -72,11 +75,14 @@ const UserProfile: React.FC = () => {
   }
 
   return (
-    <div className="grid grid-cols-3 h-full w-full rounded-md">
-  <ProfileSide setIsCPOpen={setIsCPOpen} setIsDelete={setIsDeleteOpen} />
+    <div className="grid grid-cols-1 md:grid-cols-3 h-full w-full rounded-md">
+  <div className={`${showFriend? "hidden":"grid grid-cols-1"} md:block`}>
+    <ProfileSide setShowFriend={setShowFriend} setIsDelete={setIsDeleteOpen} />
+  </div>
 
   {/* Friends Section */ }
-  <div className="col-span-2 flex flex-col bg-gradient-to-l from-gray-100 to-blue-50 rounded-md shadow-lg p-6 overflow-hidden">
+  <div className={`${showFriend ? "block" : "hidden"} col-span-2 md:flex flex-col bg-gradient-to-l from-gray-100 to-blue-50 rounded-md shadow-lg p-6 overflow-hidden`}>
+    <button onClick={()=> setShowFriend(false)} className={`md:hidden bg-blue-500 text-white p-1 rounded-md`}>Back</button>
     <h2 className="text-2xl font-bold text-blue-800 mb-4">Friends</h2>
     <input
       type="text"
@@ -111,9 +117,7 @@ const UserProfile: React.FC = () => {
     )}
   </div>
 
-  {isCPOpen && <ChangePassword setIsCPOpen={setIsCPOpen} />}
-
-  {RemoveFriend && <RemoveFriendModal setRemoveFriend={setRemoveFriend} handleRemove={handleRemove} user={User} />}
+  {RemoveFriend && User &&<RemoveFriendModal setRemoveFriend={setRemoveFriend} handleRemove={handleRemove} user={User} />}
 
   {isDeleteOpen && <DeleteUser  setIsDelete={setIsDeleteOpen}/>}
 </div>

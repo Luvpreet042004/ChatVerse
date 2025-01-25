@@ -1,13 +1,17 @@
-// src/firebase-admin.ts
 import admin from "firebase-admin";
 
-const serviceAccount = require("./config/serviceAccountKey.json");
+const serviceAccount = require("./config/securityAccountKey.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 });
 
-export const verifyToken = async (token: string) => {
+export interface DecodedIdToken {
+    uid: string;
+    email?: string; 
+}
+
+export const verifyToken = async (token: string): Promise<DecodedIdToken> => {
     try {
         const decodedToken = await admin.auth().verifyIdToken(token);
         return decodedToken;

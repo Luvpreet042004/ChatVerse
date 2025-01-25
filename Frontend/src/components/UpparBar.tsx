@@ -35,7 +35,7 @@ const UpparBar : React.FC = ()=>{
         ): connections;
 
     return(
-      <div className="col-span-1 flex flex-col bg-gradient-to-r from-gray-100 to-blue-50 rounded-md shadow-md p-4 overflow-hidden">
+      <div className="col-span-1  h-full md:flex flex-col bg-gradient-to-r from-gray-100 to-blue-50 rounded-md shadow-md p-4 overflow-hidden">
         <h2 className="text-xl font-bold mb-4">Chats</h2>
         <input
           type="text"

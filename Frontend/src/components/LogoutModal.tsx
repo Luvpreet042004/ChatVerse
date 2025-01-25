@@ -27,6 +27,7 @@ export const LogoutModal : React.FC<Props> = ({setIsLoggingOut})=>{
                         localStorage.removeItem("authToken");
                         localStorage.removeItem("userId");
                         localStorage.removeItem("userName");
+                        localStorage.removeItem("userEmail");
                         navigate("/login");
                       }}
                     >

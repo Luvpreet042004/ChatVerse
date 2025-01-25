@@ -1,47 +1,44 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import { io } from '../server';
 const prisma = new PrismaClient();
+import { getAuth } from "firebase-admin/auth";
 dotenv.config()
 const JWT_SECRET = process.env.JWT_SECRET;
 
+if (!JWT_SECRET) {
+    throw new Error("JWT_SECRET is not defined in environment variables");
+}
 
+// Register User
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
-    const { name, email, password } = req.body;
+    const { name, email } = req.body;
 
     try {
-        if (!JWT_SECRET) {
-            throw new Error("JWT_SECRET is not defined in environment variables");
-        }
-
+        // Check if user already exists
         const existingUser = await prisma.user.findUnique({ where: { email } });
         if (existingUser) {
             res.status(400).json({ message: 'User already exists' });
             console.log("User already exists");
-            
             return;
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-
+        // Create a new user
         const newUser = await prisma.user.create({
             data: {
                 name,
                 email,
-                password: hashedPassword,
             },
         });
 
-        const token = jwt.sign({ userId: newUser.id, email }, JWT_SECRET, { expiresIn: '1h' });
+        // Generate a JWT token
 
-        res.status(201).json({ message: 'User registered successfully',
-                token,
-                id : newUser.id,
-                name: newUser.name,
-                email : newUser.email
+        res.status(201).json({
+            message: 'User registered successfully',
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
         });
     } catch (error) {
         console.error("Error during registration:", error);
@@ -49,103 +46,62 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
     }
 };
 
-export const loginUser = async (req: Request, res: Response):Promise<void> => {
-    const { email, password } = req.body;
+// Login User
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
+    const email = req.user?.email;
 
     try {
-        const user = await prisma.user.findUnique({ where : {email}});
+        // Find the user by email
+        const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
             res.status(400).json({ message: 'Invalid credentials' });
-            return ;
+            return;
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            res.status(400).json({ message: 'Invalid credentials' });
-            return 
-        }
-
-        const token = jwt.sign({ id: user.id, email }, JWT_SECRET as string, { expiresIn: '2days' });
-        
-
-        res.status(200).json({ message: 'Login successful',
-                token,
-                id: user.id,
-                name: user.name,
-                email: user.email
-         });
+        res.status(200).json({
+            message: 'Login successful',
+            id: user.id,
+            name: user.name,
+            email: user.email,
+        });
     } catch (error) {
+        console.error("Error during login:", error);
         res.status(500).json({ message: 'Server error' });
     }
 };
 
-export const updateUser = async (req: Request, res: Response):Promise<void> => {
-    const {oldPassword,newPassword} = req.body;
-    const email = req.user?.email;
-
-    if(!email){
-        res.status(400).json({ message: 'Invalid credentials' });
-            return ;
-    }
-
-    try {
-        const user = await prisma.user.findUnique({where :{email}});
-        if (!user) {
-            res.status(400).json({ message: 'Invalid credentials' });
-            return ;
-        }
-
-
-        const isMatch = await bcrypt.compare(oldPassword, user.password);
-        if (!isMatch) {
-            res.status(400).json({ message: 'Invalid credentials' });
-            return 
-        }
-
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-        await prisma.user.update({
-            where: { id: user.id },
-            data: {
-                password: hashedPassword
-            },
-        });
-        const token = jwt.sign({ userId: user.id, email }, JWT_SECRET as string, { expiresIn: '2days' });
-
-        res.status(200).json({ message: 'Password updated successfully',token });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-}
 
 export const deleteUser = async (req: Request, res: Response):Promise<void> => {
-    const email = req.user?.email;
-    const password = req.body.password;
-
-    if(!email){
-        res.status(400).json({ message: 'Invalid credentials' });
-            return ;
+    const email = req.user?.email; // User ID from JWT
+    const firebaseUid = req.user?.uid; // Firebase UID from JWT or stored in your DB
+    if (!firebaseUid) {
+        throw new Error("Firebase UID is missing.");
     }
 
     try {
-        const user = await prisma.user.findUnique({where :{email}});
-        if (!user) {
-            res.status(400).json({ message: 'Invalid credentials' });
-            return ;
-        }
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            res.status(400).json({ message: 'Invalid credentials' });
-            return 
+
+        const user = await prisma.user.findUnique({where : {email}})
+        const userId = user?.id;
+        if(!userId && firebaseUid) {return}
+
+            // Step 2: Delete the user from the database
+            await prisma.user.delete({ where: { id: userId } });
+
+        // Step 3: Delete user from Firebase
+        await getAuth().deleteUser(firebaseUid);
+
+        // Respond with success
+        res.status(200).json({ message: "User deleted successfully." });
+    } catch (error:any) {
+        console.error("Error during user deletion:", error);
+
+        if (error.code === "auth/user-not-found") {
+            res.status(404).json({ message: "User not found in Firebase." });return 
         }
 
-        await prisma.user.delete({where : {id : user.id}});
-
-        res.status(200).json({ message: 'User deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: "Failed to delete user. Please try again." });
     }
-}
+};
 
 export const getUser = async (req: Request, res: Response):Promise<void> => {
     const email = req.body.email;
@@ -169,10 +125,10 @@ export const getUser = async (req: Request, res: Response):Promise<void> => {
 }
 
 export const addConnection = async (req: Request, res: Response): Promise<void> => {
-    const id = req.user?.id; // Assuming `req.user` contains the authenticated user's information
+    const email = req.user?.email; // Assuming `req.user` contains the authenticated user's information
     const { connectionEmail } = req.body;
 
-    if (!id) {
+    if (!email) {
         res.status(400).json({ message: 'Invalid credentials' });
         return;
     }
@@ -180,13 +136,14 @@ export const addConnection = async (req: Request, res: Response): Promise<void> 
     try {
         // Find the user making the request
         const user = await prisma.user.findUnique({
-            where: { id },
+            where: { email },
         });
 
         if (!user) {
             res.status(404).json({ message: 'User not found' });
             return;
         }
+        const id = user.id;
 
         // Find the user to be connected
         const connectionUser = await prisma.user.findUnique({
@@ -228,9 +185,9 @@ export const addConnection = async (req: Request, res: Response): Promise<void> 
 };
 
 export const connections = async (req: Request, res: Response): Promise<void> => {
-    const id = req.user?.id;
+    const email = req.user?.email;
 
-    if (!id) {
+    if (!email) {
         res.status(400).json({ message: 'Invalid credentials' });
         return;
     }
@@ -238,7 +195,7 @@ export const connections = async (req: Request, res: Response): Promise<void> =>
     try {
         
         const user = await prisma.user.findUnique({
-            where: { id },
+            where: { email },
             include: { connections: true },
         });
 
@@ -294,18 +251,18 @@ export const getFriend = async (req: Request, res: Response):Promise<void> => {
 }
 
 export const RemoveConnection = async (req: Request, res: Response): Promise<void> => {
-    const userId = req.user?.id; // Ensure your middleware sets `req.user`
+    const email = req.user?.email; // Ensure your middleware sets `req.user`
     const {connectionId} = req.body; // Ensure `connectionId` is sent in the body
   
     try {
-      if (!userId || !connectionId) {
+      if (!email || !connectionId) {
         res.status(400).json({ error: "Invalid request. User ID or Connection ID is missing." });
         return;
       }
   
       // Remove the connection for both users
       await prisma.user.update({
-        where: { id: userId },
+        where: { email },
         data: {
           connections: {
             disconnect: { id: connectionId },
@@ -313,7 +270,7 @@ export const RemoveConnection = async (req: Request, res: Response): Promise<voi
         },
       });
 
-      const newConnections = await prisma.user.findUnique({where : {id : userId},select : {connections : {select : {id : true,email :true,name:true}} }})
+      const newConnections = await prisma.user.findUnique({where : {email},select : {connections : {select : {id : true,email :true,name:true}} }})
   
       res.status(200).json({ message: "Connection removed successfully.", newConnections});
     } catch (error) {

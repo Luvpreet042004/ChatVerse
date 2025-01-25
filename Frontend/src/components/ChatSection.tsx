@@ -34,6 +34,12 @@ const ChatComponent: React.FC = () => {
     messagesEndRef.current?.scrollIntoView();
   };
   
+  const scrollToLatestMessageSmooth = () => {
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    });
+  };
+  
 
   useEffect(() => {
     if (socket && senderId && receiverId) {
@@ -86,7 +92,7 @@ const ChatComponent: React.FC = () => {
 
       const handleNewMessage = (message: Message) => {
         setMessages((prev) => [...prev, message]);
-        scrollToLatestMessage();
+        scrollToLatestMessageSmooth();
       };
 
       socket.on('receiveMessage', handleNewMessage);
@@ -97,11 +103,9 @@ const ChatComponent: React.FC = () => {
     }
   }, [socket, senderId, receiverId]); // Re-run when senderId or receiverId changes
 
-
   useLayoutEffect(() => {
-    scrollToLatestMessage();
+    scrollToLatestMessage()
   }, [messages]);
-
 
 
   const handleSend = async () => {
@@ -140,7 +144,7 @@ const ChatComponent: React.FC = () => {
 
   {/* Message List */}
   <div 
-  className="flex-grow overflow-y-auto custom-scrollbar bg-[#faf5ee] p-4 mb-[76px] mt-14 rounded-lg"
+  className="flex-grow overflow-y-auto scroll-smooth custom-scrollbar bg-[#faf5ee] p-4 mb-[76px] mt-14 rounded-lg"
   >
     {Array.isArray(messages) &&
       messages.map((message, index) => (
