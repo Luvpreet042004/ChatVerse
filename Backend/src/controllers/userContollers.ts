@@ -5,11 +5,6 @@ import { io } from '../server';
 const prisma = new PrismaClient();
 import { getAuth } from "firebase-admin/auth";
 dotenv.config()
-const JWT_SECRET = process.env.JWT_SECRET;
-
-if (!JWT_SECRET) {
-    throw new Error("JWT_SECRET is not defined in environment variables");
-}
 
 // Register User
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
@@ -31,8 +26,6 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
                 email,
             },
         });
-
-        // Generate a JWT token
 
         res.status(201).json({
             message: 'User registered successfully',
@@ -72,8 +65,8 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
 
 export const deleteUser = async (req: Request, res: Response):Promise<void> => {
-    const email = req.user?.email; // User ID from JWT
-    const firebaseUid = req.user?.uid; // Firebase UID from JWT or stored in your DB
+    const email = req.user?.email;
+    const firebaseUid = req.user?.uid; 
     if (!firebaseUid) {
         throw new Error("Firebase UID is missing.");
     }
