@@ -8,7 +8,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(()=>{
-      const token = localStorage.getItem('authToken')
+      const token = localStorage.getItem('authToken') && localStorage.getItem('userId') && localStorage.getItem('userName') && localStorage.getItem('userEmail')
       if(token){
         navigate('/dashboard/friend',{replace : true});
       }
