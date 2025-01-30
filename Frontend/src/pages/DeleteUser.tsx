@@ -14,7 +14,7 @@ const DeleteUser: React.FC<Props> = ({setIsDelete}) => {
 
         try {
             const token = localStorage.getItem("authToken"); // Retrieve the token
-            const response = await axios.delete(`${process.env.BASE_URL}/users/deleteUser`, {
+            const response = await axios.delete(`${process.env.BASE_URL}/api/users/deleteUser`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

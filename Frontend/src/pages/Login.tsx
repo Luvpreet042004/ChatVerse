@@ -41,7 +41,7 @@ const Login: React.FC = () => {
       const user = userCredential.user;
       const token = await user.getIdToken();
 
-      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/login`,{
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/users/login`,{
         headers :{
           Authorization :`Bearer ${token}`
         }
@@ -72,7 +72,7 @@ const Login: React.FC = () => {
       const user = result.user;
       const token = await user.getIdToken();
 
-      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/login`,{
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/users/login`,{
         headers :{
           Authorization :`Bearer ${token}`
         }

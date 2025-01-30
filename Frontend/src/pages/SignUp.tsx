@@ -36,16 +36,16 @@ const SignUp: React.FC = () => {
           const token = await user.getIdToken();
           localStorage.setItem("authToken", token);
 
-          const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`,{name,email})
+          const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/users/register`,{name,email})
 
           localStorage.setItem("userName",name)
           localStorage.setItem("userId",response.data.id)
           alert('Sign-up successful');
           navigate('/dashboard/friend',{ replace: true });
           window.history.pushState(null,'','/dashboard/friend')
-        } catch (emailError) {
+        } catch (backendError) {
           // If sendEmailVerification fails, delete the user
-          console.log(emailError);
+          console.log(backendError);
           
           await user.delete();
           throw new Error('Failed to send verification email. Please try again.');
@@ -78,7 +78,7 @@ const SignUp: React.FC = () => {
   
       // Send user data to backend
       try {
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, { name, email });
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/users/register`, { name, email });
         
         // Store backend response data in localStorage
         localStorage.setItem("userName", response.data.name);

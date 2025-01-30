@@ -65,7 +65,7 @@ export const AddUserModal: React.FC<AddUserProps> = ({ setIsAddUserOpen }) => {
         try {
             const token = localStorage.getItem('authToken');
             const response = await axios.post(
-                `${import.meta.env.VITE_BASE_URL}/users/check`,
+                `${import.meta.env.VITE_BASE_URL}/api/users/check`,
                 { email },
                 {
                     headers: {
@@ -90,7 +90,7 @@ export const AddUserModal: React.FC<AddUserProps> = ({ setIsAddUserOpen }) => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.post(
-                `${import.meta.env.VITE_BASE_URL}/users/connect`,
+                `${import.meta.env.VITE_BASE_URL}/api/users/connect`,
                 { connectionEmail: email },
                 {
                     headers: {
@@ -99,7 +99,7 @@ export const AddUserModal: React.FC<AddUserProps> = ({ setIsAddUserOpen }) => {
                 }
             );
 
-            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/connections`, {
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/users/connections`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

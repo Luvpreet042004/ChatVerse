@@ -14,7 +14,7 @@ const UpparBar : React.FC = ()=>{
         try {
             const token = localStorage.getItem('authToken');
             setLoading(true);
-            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/connections`, {
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/users/connections`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },});

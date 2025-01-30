@@ -25,7 +25,7 @@ const UserProfile: React.FC = () => {
     const fetchConnections = async () => {
       try {
           setLoading(true);
-          const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/connections`, {
+          const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/users/connections`, {
           headers: {
               Authorization: `Bearer ${token}`,
           },});
@@ -56,7 +56,7 @@ const UserProfile: React.FC = () => {
     const token = localStorage.getItem("authToken");
 
   try {
-    const response = await axios.delete(`${import.meta.env.VITE_BASE_URL}/users/deleteConnections`, {
+    const response = await axios.delete(`${import.meta.env.VITE_BASE_URL}/api/users/deleteConnections`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json", // Ensure proper content type for JSON

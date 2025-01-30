@@ -9,4 +9,4 @@ export const IsOpenProvider: React.FC<{children : ReactNode}> = ({ children}) =>
             {children}
         </IsOpenContext.Provider>
     );
-};
+}; 

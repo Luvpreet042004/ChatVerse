@@ -8,4 +8,4 @@ export const useIsOpenContext = () => {
         throw new Error("useIsOpen must be used within a IsOpenProvider");
     }
     return context;
-};
+}; 

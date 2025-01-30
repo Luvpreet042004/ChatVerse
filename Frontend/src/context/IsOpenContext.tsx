@@ -8,3 +8,4 @@ export type IsOpenContextType = {
 
 // Create the context
 export const IsOpenContext = React.createContext<IsOpenContextType | undefined>(undefined);
+ 
