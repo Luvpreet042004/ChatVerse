@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { io } from '../server';
 const prisma = new PrismaClient();
 import { getAuth } from "firebase-admin/auth";
+import { number } from 'zod';
 dotenv.config()
 
 // Register User
@@ -65,6 +66,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
 
 export const deleteUser = async (req: Request, res: Response):Promise<void> => {
+    const id = req.params.userId;
     const email = req.user?.email;
     const firebaseUid = req.user?.uid; 
     if (!firebaseUid) {
@@ -75,7 +77,7 @@ export const deleteUser = async (req: Request, res: Response):Promise<void> => {
 
         const user = await prisma.user.findUnique({where : {email}})
         const userId = user?.id;
-        if(!userId && firebaseUid) {return}
+        if(!userId && firebaseUid && (userId == Number(id))) {return}
 
             // Step 2: Delete the user from the database
             await prisma.user.delete({ where: { id: userId } });
